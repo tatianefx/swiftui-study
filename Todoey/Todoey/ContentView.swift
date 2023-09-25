@@ -19,7 +19,9 @@ struct ContentView: View {
         NavigationView {
             List(todoeyList) { item in
                 Text(item.title)
-
+                    .onTapGesture {
+                        print("Select \(item.title)")
+                    }
             }
             .navigationTitle("Todoey List")
         }
