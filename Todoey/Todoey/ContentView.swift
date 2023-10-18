@@ -9,10 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     
+    @State private var item = ""
+    
+    @State private var showingAlert = false
+    
     @State private var todoeyList = [
-        Todoey(id: 1, title: "Find Mike"),
-        Todoey(id: 2, title: "Buy Eggos"),
-        Todoey(id: 3, title: "Destroy Demogorgon")
+        Todoey(id: 0, title: "Find Mike"),
+        Todoey(id: 1, title: "Buy Eggos"),
+        Todoey(id: 2, title: "Destroy Demogorgon")
     ]
     
     var body: some View {
@@ -32,7 +36,28 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Todoey List")
+            .toolbar {
+                Button {
+                    showingAlert = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .alert("Add New Todoey Item", isPresented: $showingAlert) {
+                    TextField("", text: $item)
+                    Button("Save", action: save)
+                } message: {
+                    Text("Add Item")
+                }
+            }
         }
+    }
+    
+    func save() {
+        print("Add \(item)")
+        let id = todoeyList.count
+        let todoey = Todoey(id: id, title: item)
+        item = ""
+        todoeyList.append(todoey)
     }
 }
 
