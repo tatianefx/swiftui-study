@@ -13,12 +13,12 @@ struct ContentView: View {
     
     @State private var showingAlert = false
     
-    @State private var todoeyList = [
-        Todoey(id: 0, title: "Find Mike"),
-        Todoey(id: 1, title: "Buy Eggos"),
-        Todoey(id: 2, title: "Destroy Demogorgon")
-    ]
+    @State private var todoeyList: [Todoey] = []
     
+    let userDefaults = UserDefaults.standard
+
+    let TodoeyKey = "TodoList"
+
     var body: some View {
         NavigationView {
             List($todoeyList) { $item in
@@ -49,7 +49,14 @@ struct ContentView: View {
                     Text("Add Item")
                 }
             }
+        }.onAppear(perform: fetch)
+    }
+    
+    func fetch() {
+        guard let list = userDefaults.object(forKey: TodoeyKey) as? [Todoey] else {
+            return
         }
+        todoeyList = list
     }
     
     func save() {
@@ -58,6 +65,7 @@ struct ContentView: View {
         let todoey = Todoey(id: id, title: item)
         item = ""
         todoeyList.append(todoey)
+        userDefaults.set(self.todoeyList, forKey: TodoeyKey)
     }
 }
 
