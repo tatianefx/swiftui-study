@@ -13,7 +13,12 @@ struct ContentView: View {
     
     @State private var showingAlert = false
     
-    @State private var todoeyList: [Todoey] = []
+    @State private var todoeyList = [
+        Item(id: 0, title: "Find Mike"),
+        Item(id: 1, title: "Buy Eggos"),
+        Item(id: 2, title: "Destroy Demogorgon")
+
+    ]
     
     let userDefaults = UserDefaults.standard
 
@@ -53,7 +58,7 @@ struct ContentView: View {
     }
     
     func fetch() {
-        guard let list = userDefaults.object(forKey: TodoeyKey) as? [Todoey] else {
+        guard let list = userDefaults.object(forKey: TodoeyKey) as? [Item] else {
             return
         }
         todoeyList = list
@@ -62,7 +67,7 @@ struct ContentView: View {
     func save() {
         print("Add \(item)")
         let id = todoeyList.count
-        let todoey = Todoey(id: id, title: item)
+        let todoey = Item(id: id, title: item)
         item = ""
         todoeyList.append(todoey)
         userDefaults.set(self.todoeyList, forKey: TodoeyKey)
@@ -73,10 +78,4 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
-}
-
-struct Todoey: Identifiable {
-    let id: Int
-    let title: String
-    var isSelected: Bool = false
 }
