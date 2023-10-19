@@ -49,7 +49,7 @@ struct ContentView: View {
                 }
                 .alert("Add New Todoey Item", isPresented: $showingAlert) {
                     TextField("", text: $item)
-                    Button("Save", action: save)
+                    Button("Save", action: saveItems)
                 } message: {
                     Text("Add Item")
                 }
@@ -64,7 +64,7 @@ struct ContentView: View {
         todoeyList = list
     }
     
-    func save() {
+    func saveItems() {
         print("Add \(item)")
         let id = todoeyList.count
         let todoey = Item(id: id, title: item)
