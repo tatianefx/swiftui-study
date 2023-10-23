@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Item: Identifiable {
+struct Item: Identifiable, Codable {
     let id: Int
     let title: String
     var isSelected: Bool = false

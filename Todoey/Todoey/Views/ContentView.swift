@@ -19,10 +19,8 @@ struct ContentView: View {
         Item(id: 2, title: "Destroy Demogorgon")
 
     ]
-    
-    let userDefaults = UserDefaults.standard
-
-    let TodoeyKey = "TodoList"
+        
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Todoey.plist")
 
     var body: some View {
         NavigationView {
@@ -58,10 +56,7 @@ struct ContentView: View {
     }
     
     func fetch() {
-        guard let list = userDefaults.object(forKey: TodoeyKey) as? [Item] else {
-            return
-        }
-        todoeyList = list
+        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true))
     }
     
     func saveItems() {
@@ -70,7 +65,16 @@ struct ContentView: View {
         let todoey = Item(id: id, title: item)
         item = ""
         todoeyList.append(todoey)
-        userDefaults.set(self.todoeyList, forKey: TodoeyKey)
+        
+        guard let dataFilePath = dataFilePath else { return }
+        
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(todoeyList)
+            try data.write(to: dataFilePath)
+        } catch {
+            print("Error encoding todoey array")
+        }
     }
 }
 
