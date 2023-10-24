@@ -13,12 +13,7 @@ struct ContentView: View {
     
     @State private var showingAlert = false
     
-    @State private var todoeyList = [
-        Item(id: 0, title: "Find Mike"),
-        Item(id: 1, title: "Buy Eggos"),
-        Item(id: 2, title: "Destroy Demogorgon")
-
-    ]
+    @State private var todoeyList = [Item]()
         
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Todoey.plist")
 
@@ -52,11 +47,25 @@ struct ContentView: View {
                     Text("Add Item")
                 }
             }
-        }.onAppear(perform: fetch)
+        }.onAppear(perform: loadItems)
     }
     
-    func fetch() {
-        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true))
+    func loadItems() {
+        guard let dataFilePath = dataFilePath,
+              let data = try? Data(contentsOf: dataFilePath)
+        else { return }
+        
+        let decoder = PropertyListDecoder()
+        var items = [Item]()
+        do {
+            items = try decoder.decode([Item].self, from: data)
+        } catch {
+            print("Error dencoding todoey array")
+        }
+        
+        DispatchQueue.main.async {
+            self.todoeyList = items
+        }
     }
     
     func saveItems() {
