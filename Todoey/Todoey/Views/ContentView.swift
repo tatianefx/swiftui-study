@@ -22,6 +22,7 @@ struct ContentView: View {
             List($todoeyList) { $item in
                 Button {
                     item.isSelected.toggle()
+                    persistItems()
                     print("Select \(item.title)")
                 } label: {
                     HStack {
@@ -42,7 +43,7 @@ struct ContentView: View {
                 }
                 .alert("Add New Todoey Item", isPresented: $showingAlert) {
                     TextField("", text: $item)
-                    Button("Save", action: saveItems)
+                    Button("Save", action: saveItem)
                 } message: {
                     Text("Add Item")
                 }
@@ -68,13 +69,19 @@ struct ContentView: View {
         }
     }
     
-    func saveItems() {
+    func saveItem() {
         print("Add \(item)")
+        
         let id = todoeyList.count
         let todoey = Item(id: id, title: item)
+        
         item = ""
         todoeyList.append(todoey)
         
+        persistItems()
+    }
+    
+    func persistItems() {
         guard let dataFilePath = dataFilePath else { return }
         
         let encoder = PropertyListEncoder()
