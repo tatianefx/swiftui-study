@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import CoreData
 
 @main
 struct TodoeyApp: App {
+    
+    // Initialize the Core Data stack
+    let persistenceController = PersistenceController.shared
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
 }

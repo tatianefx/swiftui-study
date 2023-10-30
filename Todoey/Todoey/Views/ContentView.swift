@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ContentView: View {
     
@@ -13,20 +14,25 @@ struct ContentView: View {
     
     @State private var showingAlert = false
     
-    @State private var todoeyList = [Item]()
+    @State private var todoeyList: [Item] = []
         
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Todoey.plist")
-
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @FetchRequest(
+        entity: Item.entity(),
+        sortDescriptors: []
+    ) var entities: FetchedResults<Item>
+    
     var body: some View {
         NavigationView {
             List($todoeyList) { $item in
                 Button {
                     item.isSelected.toggle()
                     persistItems()
-                    print("Select \(item.title)")
+                    print("Select \(item.title ?? "")")
                 } label: {
                     HStack {
-                        Text(item.title)
+                        Text(item.title ?? "")
                         Spacer()
                         Image(systemName: "checkmark")
                             .foregroundColor(.blue)
@@ -52,28 +58,17 @@ struct ContentView: View {
     }
     
     func loadItems() {
-        guard let dataFilePath = dataFilePath,
-              let data = try? Data(contentsOf: dataFilePath)
-        else { return }
-        
-        let decoder = PropertyListDecoder()
-        var items = [Item]()
-        do {
-            items = try decoder.decode([Item].self, from: data)
-        } catch {
-            print("Error dencoding todoey array")
-        }
-        
         DispatchQueue.main.async {
-            self.todoeyList = items
+            self.todoeyList = entities.reversed()
         }
     }
     
     func saveItem() {
         print("Add \(item)")
         
-        let id = todoeyList.count
-        let todoey = Item(id: id, title: item)
+        let todoey = Item(context: viewContext)
+        todoey.id = Int64(todoeyList.count)
+        todoey.title = item
         
         item = ""
         todoeyList.append(todoey)
@@ -82,14 +77,11 @@ struct ContentView: View {
     }
     
     func persistItems() {
-        guard let dataFilePath = dataFilePath else { return }
-        
-        let encoder = PropertyListEncoder()
         do {
-            let data = try encoder.encode(todoeyList)
-            try data.write(to: dataFilePath)
+            try viewContext.save() // Salvar o contexto do Core Data
         } catch {
-            print("Error encoding todoey array")
+            let nsError = error as NSError
+            fatalError("Erro ao salvar no Core Data: \(nsError)")
         }
     }
 }
