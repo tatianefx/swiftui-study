@@ -13,30 +13,28 @@ struct ContentView: View {
     @State private var item = ""
     
     @State private var showingAlert = false
-    
-    @State private var todoeyList: [Item] = []
-        
+            
     @Environment(\.managedObjectContext) private var viewContext
     
     @FetchRequest(
         entity: Item.entity(),
         sortDescriptors: []
-    ) var entities: FetchedResults<Item>
+    ) var todoeyList: FetchedResults<Item>
     
     var body: some View {
         NavigationView {
-            List($todoeyList) { $item in
-                Button {
-                    item.isSelected.toggle()
-                    persistItems()
-                    print("Select \(item.title ?? "")")
-                } label: {
-                    HStack {
-                        Text(item.title ?? "")
-                        Spacer()
-                        Image(systemName: "checkmark")
-                            .foregroundColor(.blue)
-                            .opacity(item.isSelected ? 1.0 : 0.0)
+            List {
+                ForEach(todoeyList, id: \.self) { item in
+                    Button {
+                        updateItem(item)
+                    } label: {
+                        HStack {
+                            Text(item.title ?? "")
+                            Spacer()
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                                .opacity(item.isSelected ? 1.0 : 0.0)
+                        }
                     }
                 }
             }
@@ -58,9 +56,9 @@ struct ContentView: View {
     }
     
     func loadItems() {
-        DispatchQueue.main.async {
-            self.todoeyList = entities.reversed()
-        }
+//        DispatchQueue.main.async {
+//            self.todoeyList = todoeyList.reversed()
+//        }
     }
     
     func saveItem() {
@@ -71,9 +69,14 @@ struct ContentView: View {
         todoey.title = item
         
         item = ""
-        todoeyList.append(todoey)
         
         persistItems()
+    }
+    
+    func updateItem(_ item: Item) {
+        item.isSelected.toggle()
+        persistItems()
+        print("Select \(item.title ?? "")")
     }
     
     func persistItems() {
