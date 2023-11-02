@@ -52,13 +52,7 @@ struct ContentView: View {
                     Text("Add Item")
                 }
             }
-        }.onAppear(perform: loadItems)
-    }
-    
-    func loadItems() {
-//        DispatchQueue.main.async {
-//            self.todoeyList = todoeyList.reversed()
-//        }
+        }
     }
     
     func saveItem() {
